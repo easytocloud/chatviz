@@ -82,6 +82,8 @@ jobs:
           cd frontend
           npm ci
           npm run build
+          rm -rf ../src/chatviz/static
+          cp -r dist ../src/chatviz/static
 
       - name: Build package
         if: steps.semantic.outputs.new_release_version != ''
