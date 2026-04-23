@@ -47,3 +47,4 @@ chatviz = "chatviz.__main__:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/chatviz"]
+artifacts = ["src/chatviz/static/**"]
