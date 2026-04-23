@@ -1,3 +1,10 @@
+# [1.4.0](https://github.com/easytocloud/chatviz/compare/v1.3.0...v1.4.0) (2026-04-23)
+
+
+### Features
+
+* add --version flag to display chatviz version ([e1bd9a8](https://github.com/easytocloud/chatviz/commit/e1bd9a8e24a863a4f6d09af83f91e619c0fbe173))
+
 # [1.3.0](https://github.com/easytocloud/chatviz/compare/v1.2.0...v1.3.0) (2026-04-23)
 
 
