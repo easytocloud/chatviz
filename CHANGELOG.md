@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/easytocloud/chatviz/compare/v1.2.0...v1.3.0) (2026-04-23)
+
+
+### Features
+
+* upstream compatibility check before starting agent, --force to skip; update README with data flow diagrams ([ec4ff65](https://github.com/easytocloud/chatviz/commit/ec4ff65d7844e42966c88002380f402123dbe08a))
+
 # [1.2.0](https://github.com/easytocloud/chatviz/compare/v1.1.0...v1.2.0) (2026-04-23)
 
 
