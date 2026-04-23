@@ -1,3 +1,10 @@
+## [1.0.9](https://github.com/easytocloud/chatviz/compare/v1.0.8...v1.0.9) (2026-04-23)
+
+
+### Bug Fixes
+
+* build wheel with --no-isolation to preserve copied static files ([43a3f5d](https://github.com/easytocloud/chatviz/commit/43a3f5d287f5736a2426ca7c307a08490209e629))
+
 ## [1.0.8](https://github.com/easytocloud/chatviz/compare/v1.0.7...v1.0.8) (2026-04-23)
 
 
