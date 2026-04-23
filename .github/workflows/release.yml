@@ -76,6 +76,13 @@ jobs:
           git commit -m "chore: update version to ${{ steps.semantic.outputs.new_release_version }} [skip ci]"
           git push
 
+      - name: Build frontend
+        if: steps.semantic.outputs.new_release_version != ''
+        run: |
+          cd frontend
+          npm ci
+          npm run build
+
       - name: Build package
         if: steps.semantic.outputs.new_release_version != ''
         run: python -m build
