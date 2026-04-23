@@ -9,6 +9,32 @@ import urllib.error
 import uvicorn
 
 
+def _find_claude_base_url_setting() -> tuple[str, str] | tuple[None, None]:
+    """Scan Claude settings files for a *BASE_URL env var.
+
+    Returns (var_name, url) of the first match, or (None, None).
+    Checks local settings first, then global ~/.claude/settings.json.
+    """
+    import json
+    candidates = [
+        os.path.join(".claude", "settings.local.json"),
+        os.path.join(".claude", "settings.json"),
+        os.path.expanduser("~/.claude/settings.local.json"),
+        os.path.expanduser("~/.claude/settings.json"),
+    ]
+    for path in candidates:
+        try:
+            with open(path) as f:
+                data = json.load(f)
+            env_section = data.get("env", {})
+            for key, val in env_section.items():
+                if key.endswith("BASE_URL") and val:
+                    return key, val
+        except (FileNotFoundError, json.JSONDecodeError, PermissionError):
+            continue
+    return None, None
+
+
 def main() -> None:
     args = sys.argv[1:]
 
@@ -92,7 +118,15 @@ def _run_with_subcommand(port: int, subcommand: list[str], force: bool = False) 
     env = os.environ.copy()
 
     if cmd == "claude":
-        env["ANTHROPIC_BASE_URL"] = base_url
+        # discover *BASE_URL from Claude settings if --upstream not given
+        base_url_var, upstream_from_settings = _find_claude_base_url_setting()
+        if base_url_var and not os.environ.get("CHATVIZ_UPSTREAM"):
+            os.environ["CHATVIZ_UPSTREAM"] = upstream_from_settings
+            env["CHATVIZ_UPSTREAM"] = upstream_from_settings
+            # redirect the same variable name to our proxy
+            env[base_url_var] = base_url
+        else:
+            env["ANTHROPIC_BASE_URL"] = base_url
         # keep claude from trying to sign — proxy handles auth
         env.setdefault("ANTHROPIC_API_KEY", "chatviz-proxy")
         env["CLAUDE_CODE_SKIP_BEDROCK_AUTH"] = "1"
