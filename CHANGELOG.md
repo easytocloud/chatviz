@@ -1,3 +1,10 @@
+## [1.0.7](https://github.com/easytocloud/chatviz/compare/v1.0.6...v1.0.7) (2026-04-23)
+
+
+### Bug Fixes
+
+* remove force-include, hatchling finds static inside src/chatviz automatically ([2bf1bc4](https://github.com/easytocloud/chatviz/commit/2bf1bc44d213c1d995eca69db32475798591dec2))
+
 ## [1.0.6](https://github.com/easytocloud/chatviz/compare/v1.0.5...v1.0.6) (2026-04-23)
 
 
