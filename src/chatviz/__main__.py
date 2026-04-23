@@ -33,6 +33,10 @@ def main() -> None:
         elif args[i] == "--force":
             force = True
             i += 1
+        elif args[i] == "--version":
+            from chatviz import __version__
+            print(f"chatviz {__version__}")
+            sys.exit(0)
         else:
             subcommand = args[i:]
             break
