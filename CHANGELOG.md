@@ -1,3 +1,10 @@
+## [1.0.6](https://github.com/easytocloud/chatviz/compare/v1.0.5...v1.0.6) (2026-04-23)
+
+
+### Bug Fixes
+
+* copy frontend dist to static before building Python package ([e24d9e2](https://github.com/easytocloud/chatviz/commit/e24d9e201290bd14352fe5e5b86363a38730a227))
+
 ## [1.0.5](https://github.com/easytocloud/chatviz/compare/v1.0.4...v1.0.5) (2026-04-23)
 
 
