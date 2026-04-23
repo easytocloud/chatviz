@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/easytocloud/chatviz/compare/v1.0.9...v1.1.0) (2026-04-23)
+
+
+### Features
+
+* add subcommand support to launch agent (e.g. 'uvx chatviz claude') with --port, --upstream, --profile flags ([da36c98](https://github.com/easytocloud/chatviz/commit/da36c98695594d752686447bbfd052063ab3f078))
+
 ## [1.0.9](https://github.com/easytocloud/chatviz/compare/v1.0.8...v1.0.9) (2026-04-23)
 
 
