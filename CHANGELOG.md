@@ -1,3 +1,10 @@
+## [1.0.8](https://github.com/easytocloud/chatviz/compare/v1.0.7...v1.0.8) (2026-04-23)
+
+
+### Bug Fixes
+
+* include static frontend assets in wheel via hatchling artifacts ([da4b5a0](https://github.com/easytocloud/chatviz/commit/da4b5a05439eb0a53cc548326118e7c32a3684a3))
+
 ## [1.0.7](https://github.com/easytocloud/chatviz/compare/v1.0.6...v1.0.7) (2026-04-23)
 
 
