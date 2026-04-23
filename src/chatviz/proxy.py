@@ -79,7 +79,6 @@ def _sigv4_sign(url: str, body: bytes, headers: dict) -> tuple[dict, bool, str]:
     service, region = parts[0], parts[1]
     # resolve_credentials() refreshes STS tokens if expired; get_frozen_credentials() does not
     credentials = _get_boto_session().get_credentials().get_frozen_credentials()
-    print(f"[SigV4] key={credentials.access_key[:8]} token={'YES' if credentials.token else 'NO'} url={url}", flush=True)
     aws_request = botocore.awsrequest.AWSRequest(
         method="POST",
         url=url,
@@ -164,8 +163,6 @@ async def _full_forward(
     async with _make_client(headers, override_host) as client:
         resp = await client.post(upstream, headers=headers, content=body)
 
-    if resp.status_code >= 400:
-        print(f"[upstream {resp.status_code}] {resp.text[:300]}", flush=True)
 
     try:
         resp_body = resp.json()
