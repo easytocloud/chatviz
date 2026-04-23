@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/easytocloud/chatviz/compare/v1.1.0...v1.2.0) (2026-04-23)
+
+
+### Features
+
+* redirect chatviz server logs to chatviz.log when running with subcommand ([ca23711](https://github.com/easytocloud/chatviz/commit/ca23711ac085b89e716176a8273510ff2bfb15ec))
+
 # [1.1.0](https://github.com/easytocloud/chatviz/compare/v1.0.9...v1.1.0) (2026-04-23)
 
 
