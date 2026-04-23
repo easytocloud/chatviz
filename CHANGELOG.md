@@ -1,3 +1,10 @@
+# [1.5.0](https://github.com/easytocloud/chatviz/compare/v1.4.0...v1.5.0) (2026-04-23)
+
+
+### Features
+
+* auto-detect upstream from Claude settings *BASE_URL ([be9b7a7](https://github.com/easytocloud/chatviz/commit/be9b7a798392e7a8843fd9d74dab2df0388b8955))
+
 # [1.4.0](https://github.com/easytocloud/chatviz/compare/v1.3.0...v1.4.0) (2026-04-23)
 
 
