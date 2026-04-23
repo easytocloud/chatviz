@@ -2,6 +2,9 @@ import os
 import subprocess
 import sys
 import threading
+import time
+import urllib.request
+import urllib.error
 
 import uvicorn
 
@@ -13,6 +16,7 @@ def main() -> None:
     port = 7890
     upstream = None
     profile = None
+    force = False
     subcommand = []
 
     i = 0
@@ -26,6 +30,9 @@ def main() -> None:
         elif args[i] == "--profile" and i + 1 < len(args):
             profile = args[i + 1]
             i += 2
+        elif args[i] == "--force":
+            force = True
+            i += 1
         else:
             subcommand = args[i:]
             break
@@ -36,13 +43,44 @@ def main() -> None:
         os.environ["CHATVIZ_AWS_PROFILE"] = profile
 
     if subcommand:
-        _run_with_subcommand(port, subcommand)
+        _run_with_subcommand(port, subcommand, force=force)
     else:
         _print_banner(port)
         uvicorn.run("chatviz.server:app", host="0.0.0.0", port=port, log_level="info")
 
 
-def _run_with_subcommand(port: int, subcommand: list[str]) -> None:
+def _check_upstream_compatibility(upstream: str) -> bool:
+    """Return True if the upstream speaks the Anthropic Messages API."""
+    import json
+    url = upstream.rstrip("/") + "/v1/messages"
+    body = json.dumps({
+        "model": "chatviz-probe",
+        "max_tokens": 1,
+        "messages": [{"role": "user", "content": "hi"}],
+    }).encode()
+    req = urllib.request.Request(
+        url, data=body,
+        headers={"Content-Type": "application/json", "x-api-key": "probe"},
+        method="POST",
+    )
+    try:
+        urllib.request.urlopen(req, timeout=5)
+        return True
+    except urllib.error.HTTPError as e:
+        # any HTTP response (even 401/400/404 with JSON body) means the endpoint exists
+        try:
+            body = e.read()
+            import json as _json
+            _json.loads(body)
+            # got a JSON error back — endpoint exists and speaks JSON
+            return e.code != 404
+        except Exception:
+            return False
+    except Exception:
+        return False
+
+
+def _run_with_subcommand(port: int, subcommand: list[str], force: bool = False) -> None:
     base_url = f"http://127.0.0.1:{port}"
 
     # detect which agent and set the right env var
@@ -60,6 +98,15 @@ def _run_with_subcommand(port: int, subcommand: list[str]) -> None:
         env["OPENAI_BASE_URL"] = base_url
         env["ANTHROPIC_BASE_URL"] = base_url
 
+    # check upstream compatibility before starting
+    upstream = os.environ.get("CHATVIZ_UPSTREAM")
+    if upstream and not force:
+        if not _check_upstream_compatibility(upstream):
+            print(f"# WARNING: upstream {upstream} does not appear to speak the Anthropic Messages API (/v1/messages).")
+            print("# Responses from this upstream may not be captured correctly.")
+            print("# Pass --force to suppress this warning and start anyway.")
+            sys.exit(1)
+
     _print_banner(port)
 
     # redirect our stdout/stderr to log file before starting the server
@@ -75,8 +122,6 @@ def _run_with_subcommand(port: int, subcommand: list[str]) -> None:
     thread.start()
 
     # wait for server to be ready
-    import time
-    import urllib.request
     for _ in range(50):
         try:
             urllib.request.urlopen(f"{base_url}/chatviz/health", timeout=1)
