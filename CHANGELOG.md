@@ -1,3 +1,5 @@
+## [1.0.1](https://github.com/easytocloud/chatviz/compare/v1.0.0...v1.0.1) (2026-04-23)
+
 # 1.0.0 (2026-04-23)
 
 
