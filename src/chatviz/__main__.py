@@ -60,6 +60,13 @@ def _run_with_subcommand(port: int, subcommand: list[str]) -> None:
         env["OPENAI_BASE_URL"] = base_url
         env["ANTHROPIC_BASE_URL"] = base_url
 
+    _print_banner(port)
+
+    # redirect our stdout/stderr to log file before starting the server
+    log_file = open("chatviz.log", "w")
+    sys.stdout = log_file
+    sys.stderr = log_file
+
     # start uvicorn in a background thread
     server = uvicorn.Server(
         uvicorn.Config("chatviz.server:app", host="0.0.0.0", port=port, log_level="info")
@@ -69,15 +76,13 @@ def _run_with_subcommand(port: int, subcommand: list[str]) -> None:
 
     # wait for server to be ready
     import time
+    import urllib.request
     for _ in range(50):
         try:
-            import urllib.request
             urllib.request.urlopen(f"{base_url}/chatviz/health", timeout=1)
             break
         except Exception:
             time.sleep(0.1)
-
-    _print_banner(port)
 
     try:
         result = subprocess.run(subcommand, env=env)
