@@ -87,7 +87,7 @@ jobs:
 
       - name: Build package
         if: steps.semantic.outputs.new_release_version != ''
-        run: python -m build
+        run: python -m build --wheel --no-isolation
 
       - name: Publish to PyPI
         if: steps.semantic.outputs.new_release_version != ''
