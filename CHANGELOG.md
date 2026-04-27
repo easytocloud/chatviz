@@ -1,3 +1,10 @@
+# [1.6.0](https://github.com/easytocloud/chatviz/compare/v1.5.0...v1.6.0) (2026-04-27)
+
+
+### Features
+
+* improved raw JSON view ([c03e95e](https://github.com/easytocloud/chatviz/commit/c03e95e96a8ef81bbf989d582cc9eb0d85bd07d1))
+
 # [1.5.0](https://github.com/easytocloud/chatviz/compare/v1.4.0...v1.5.0) (2026-04-23)
 
 
