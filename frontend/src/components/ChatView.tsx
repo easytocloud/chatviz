@@ -22,10 +22,12 @@ function isInjected(text: string): boolean {
 function contentPreview(content: CapturedMessage['content']): string {
   if (typeof content === 'string') return content.trimStart();
   if (Array.isArray(content)) {
-    return (content as any[])
+    const texts = (content as any[])
       .map((b: any) => (b?.text ?? b?.content ?? (typeof b === 'string' ? b : '')).trimStart())
-      .filter(Boolean)
-      .join(' ');
+      .filter(Boolean);
+    // Prefer non-injected (non-XML) text when mixed content is present
+    const real = texts.filter((t) => !isInjected(t));
+    return (real.length > 0 ? real : texts).join(' ');
   }
   const obj = content as any;
   return (obj?.text ?? obj?.content ?? obj?.name ?? JSON.stringify(content)).trimStart();
@@ -39,6 +41,7 @@ export function ChatView({ messages }: Props) {
   const th = useTheme();
   const selectedId = useMessageStore((s) => s.selectedId);
   const setSelected = useMessageStore((s) => s.setSelected);
+  const setJsonView = useMessageStore((s) => s.setJsonView);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const visible = messages.filter((m) => VISIBLE_TYPES.has(m.message_type));
@@ -117,6 +120,7 @@ export function ChatView({ messages }: Props) {
             {/* Bubble */}
             <div
               onClick={() => setSelected(isSelected ? null : msg.id)}
+              onDoubleClick={(e) => { e.stopPropagation(); setJsonView(msg.id); }}
               style={{
                 maxWidth: isToolMsg ? '100%' : '74%',
                 padding: isToolMsg ? '6px 12px' : '10px 14px',

@@ -114,4 +114,10 @@ uvx chatviz --upstream https://bedrock-mantle.eu-west-1.api.aws/anthropic --prof
 
 ## Visualization
 
-Open `http://localhost:7890` while a conversation is running. Messages are color-coded by role (system prompt, user, assistant, tool calls/results) and tagged with the model and API family used.
+Open `http://localhost:7890` while a conversation is running.
+
+- **Color-coded messages** by role: system prompt, user, assistant, tool calls, and tool results each have distinct colors. Each message is tagged with the API family and model used.
+- **Token counter** — the header shows cumulative input/output token totals across all captured messages (e.g. `↑12.3k ↓4.1k tokens`).
+- **Sequence view** — when tool calls are present the UI automatically switches to a timeline/sequence layout showing the full call-and-result chain. Pure chat sessions use the standard chat bubble view.
+- **Detail panel** — click any message to open a side panel with full content, metadata, and the raw request body. Tool call panels show the tool name, input arguments, and the matching result in a structured layout.
+- **JSON modal** — double-click any message bubble to open a full-screen folding JSON viewer with collapsible nodes and path highlighting. Press Escape or click outside to close.

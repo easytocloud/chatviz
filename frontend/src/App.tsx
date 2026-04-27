@@ -3,6 +3,8 @@ import { useShallow } from 'zustand/react/shallow';
 import { useSSE } from './api/sse';
 import { FilterBar } from './components/FilterBar';
 import { ChatView } from './components/ChatView';
+import { SequenceView } from './components/SequenceView';
+import { JsonViewModal } from './components/JsonViewModal';
 import { MessageCard } from './components/MessageCard';
 import { useMessageStore, useFilteredMessages } from './store/messages';
 import { ThemeContext, darkTheme, lightTheme } from './styles/theme';
@@ -19,6 +21,12 @@ export default function App() {
 
   const filtered = useFilteredMessages();
   const selected = messages.find((m) => m.id === selectedId) ?? null;
+
+  const hasToolUse = filtered.some((m) => m.message_type === 'tool_use');
+
+  const jsonViewId = useMessageStore((s) => s.jsonViewId);
+  const setJsonView = useMessageStore((s) => s.setJsonView);
+  const jsonViewMessage = messages.find((m) => m.id === jsonViewId) ?? null;
 
   return (
     <ThemeContext.Provider value={theme}>
@@ -37,6 +45,20 @@ export default function App() {
           <span style={{ color: theme.textGhost, fontSize: 12 }}>
             {messages.length} message{messages.length !== 1 ? 's' : ''} captured
           </span>
+          {(() => {
+            let totalIn = 0, totalOut = 0;
+            for (const m of messages) {
+              if (m.input_tokens != null) totalIn += m.input_tokens;
+              if (m.output_tokens != null) totalOut += m.output_tokens;
+            }
+            if (totalIn === 0 && totalOut === 0) return null;
+            const fmt = (n: number) => n >= 1000 ? `${(n / 1000).toFixed(1)}k` : String(n);
+            return (
+              <span style={{ color: theme.textGhost, fontSize: 12, fontFamily: 'monospace' }}>
+                ↑{fmt(totalIn)} ↓{fmt(totalOut)} tokens
+              </span>
+            );
+          })()}
           <div style={{ marginLeft: 'auto' }}>
             <button
               onClick={() => setIsDark(!isDark)}
@@ -56,7 +78,9 @@ export default function App() {
 
         <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
           <div style={{ flex: 1, overflow: 'auto' }}>
-            <ChatView messages={filtered} />
+            {hasToolUse
+              ? <SequenceView messages={filtered} />
+              : <ChatView messages={filtered} />}
           </div>
 
           {selected && (
@@ -70,6 +94,9 @@ export default function App() {
           )}
         </div>
       </div>
+      {jsonViewMessage && (
+        <JsonViewModal message={jsonViewMessage} onClose={() => setJsonView(null)} />
+      )}
     </ThemeContext.Provider>
   );
 }

@@ -16,4 +16,5 @@ export interface CapturedMessage {
   raw_body: object;
   input_tokens: number | null;
   output_tokens: number | null;
+  tool_use_id: string | null;
 }

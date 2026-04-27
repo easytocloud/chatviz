@@ -555,6 +555,64 @@ function SectionHeader({ label, color }: { label: string; color: string }) {
   );
 }
 
+// ── tool message panel ────────────────────────────────────────────────────────
+
+function ToolMessagePanel({ message, th, raw }: { message: CapturedMessage; th: Theme; raw: any }) {
+  const isCall = message.message_type === 'tool_use';
+  const color = isCall ? MESSAGE_COLORS.tool_use : MESSAGE_COLORS.tool_result;
+  const content = message.content as any;
+
+  // For tool_result, try to find the matching tool name from raw_body
+  let toolName: string | undefined;
+  if (!isCall && message.tool_use_id) {
+    const msgs: any[] = raw?.messages ?? [];
+    for (const m of msgs) {
+      if (m.role === 'assistant' && Array.isArray(m.content)) {
+        const block = m.content.find((b: any) => b.id === message.tool_use_id);
+        if (block) { toolName = block.name; break; }
+      }
+    }
+  } else if (isCall) {
+    toolName = content?.name;
+  }
+
+  return (
+    <div style={{ overflow: 'auto', flex: 1 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+        <span style={{ fontSize: 13, fontWeight: 700, color, fontFamily: 'monospace' }}>
+          {isCall ? '⚙ call' : '↩ result'}
+        </span>
+        {toolName && (
+          <span style={{ fontSize: 13, color, fontFamily: 'monospace' }}>{toolName}</span>
+        )}
+        {message.tool_use_id && (
+          <span style={{ fontSize: 10, color: th.textDimmer, fontFamily: 'monospace', marginLeft: 'auto' }}>
+            id: {message.tool_use_id.slice(0, 16)}
+          </span>
+        )}
+      </div>
+
+      {isCall ? (
+        <>
+          <SectionHeader label="Input" color={color} />
+          <pre style={{ margin: 0, fontSize: 11, color: '#FCD34D', background: th.bgAmberHeader, padding: '8px 10px', borderRadius: 6, overflowX: 'auto', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+            {JSON.stringify(content?.input, null, 2)}
+          </pre>
+        </>
+      ) : (
+        <>
+          <SectionHeader label="Result" color={color} />
+          <pre style={{ margin: 0, fontSize: 11, color: th.textMuted, background: th.bgSunken, padding: '8px 10px', borderRadius: 6, overflowX: 'auto', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+            {typeof message.content === 'string'
+              ? message.content
+              : JSON.stringify(message.content, null, 2)}
+          </pre>
+        </>
+      )}
+    </div>
+  );
+}
+
 // ── main ──────────────────────────────────────────────────────────────────────
 
 export function MessageCard({ message, onClose }: Props) {
@@ -562,7 +620,10 @@ export function MessageCard({ message, onClose }: Props) {
   const raw = message.raw_body as any;
   const familyColor = FAMILY_COLORS[message.api_family];
   const ts = new Date(message.timestamp).toLocaleTimeString();
-  const isRequest = message.direction === 'request';
+  // Semantic direction: tool_use is a call (request), tool_result is a return (response).
+  // Do not use the API-level direction field for this distinction.
+  const isToolMsg = message.message_type === 'tool_use' || message.message_type === 'tool_result';
+  const isRequest = !isToolMsg && message.direction === 'request';
 
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
@@ -600,7 +661,9 @@ export function MessageCard({ message, onClose }: Props) {
         display: isRequest ? 'flex' : 'block', flexDirection: 'column',
         padding: '12px 14px 20px', background: th.bgPanel,
       }}>
-        {isRequest ? (
+        {isToolMsg ? (
+          <ToolMessagePanel message={message} th={th} raw={raw} />
+        ) : isRequest ? (
           <>
             <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: th.textGhost, marginBottom: 10, flexShrink: 0 }}>
               Context sent in this call

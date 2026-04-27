@@ -11,10 +11,12 @@ interface Filters {
 interface MessageStore {
   messages: CapturedMessage[];
   selectedId: string | null;
+  jsonViewId: string | null;
   filters: Filters;
   addMessage: (m: CapturedMessage) => void;
   setMessages: (msgs: CapturedMessage[]) => void;
   setSelected: (id: string | null) => void;
+  setJsonView: (id: string | null) => void;
   setFilter: (f: Partial<Filters>) => void;
   clearMessages: () => void;
 }
@@ -22,6 +24,7 @@ interface MessageStore {
 export const useMessageStore = create<MessageStore>((set) => ({
   messages: [],
   selectedId: null,
+  jsonViewId: null,
   filters: { types: [], families: [], models: [] },
 
   addMessage: (m) =>
@@ -34,6 +37,8 @@ export const useMessageStore = create<MessageStore>((set) => ({
   setMessages: (msgs) => set({ messages: msgs }),
 
   setSelected: (id) => set({ selectedId: id }),
+
+  setJsonView: (id) => set({ jsonViewId: id }),
 
   setFilter: (f) =>
     set((state) => ({ filters: { ...state.filters, ...f } })),

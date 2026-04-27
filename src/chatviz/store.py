@@ -21,6 +21,7 @@ class CapturedMessage:
     raw_body: dict = field(default_factory=dict)
     input_tokens: int | None = None
     output_tokens: int | None = None
+    tool_use_id: str | None = None
 
     def to_dict(self) -> dict:
         return asdict(self)

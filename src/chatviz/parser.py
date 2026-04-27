@@ -57,6 +57,7 @@ def parse_request(body: dict, api_family: str, request_id: str) -> list[Captured
                                 model=model, direction="request", message_type="tool_result",
                                 content=block.get("content", ""), mcp_server=None,
                                 stream_complete=True, request_id=request_id, raw_body=body,
+                                tool_use_id=block.get("tool_use_id"),
                             ))
                 else:
                     msgs.append(CapturedMessage(
