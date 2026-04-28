@@ -156,7 +156,7 @@ async def handle_proxy(request: Request) -> Response:
 async def _full_forward(
     upstream: str, headers: dict, body: bytes, api_family: str, model: str, request_id: str
 ) -> Response:
-    if urlparse(upstream).hostname.endswith(".api.aws"):
+    if (urlparse(upstream).hostname or "").endswith(".api.aws"):
         body = _strip_aws_unsupported_body(body)
     headers, aws_signed, upstream = _sigv4_sign(upstream, body, headers)
     override_host = None if aws_signed else headers.get("host")
@@ -187,7 +187,7 @@ async def _stream_forward(
     upstream: str, headers: dict, body: bytes, api_family: str, model: str, request_id: str
 ) -> AsyncGenerator[bytes, None]:
     buffer: list[str] = []
-    if urlparse(upstream).hostname.endswith(".api.aws"):
+    if (urlparse(upstream).hostname or "").endswith(".api.aws"):
         body = _strip_aws_unsupported_body(body)
     headers, aws_signed, upstream = _sigv4_sign(upstream, body, headers)
     override_host = None if aws_signed else headers.get("host")

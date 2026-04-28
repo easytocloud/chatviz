@@ -84,7 +84,7 @@ def _check_upstream_compatibility(upstream: str) -> bool:
     import json
     url = upstream.rstrip("/") + "/v1/messages"
     body = json.dumps({
-        "model": "chatviz-probe",
+        "model": os.environ.get("ANTHROPIC_DEFAULT_HAIKU_MODEL", "claude-haiku-4-5-20251001"),
         "max_tokens": 1,
         "messages": [{"role": "user", "content": "hi"}],
     }).encode()
@@ -120,7 +120,7 @@ def _run_with_subcommand(port: int, subcommand: list[str], force: bool = False) 
     if cmd == "claude":
         # discover *BASE_URL from Claude settings if --upstream not given
         base_url_var, upstream_from_settings = _find_claude_base_url_setting()
-        if base_url_var and not os.environ.get("CHATVIZ_UPSTREAM"):
+        if base_url_var and upstream_from_settings and not os.environ.get("CHATVIZ_UPSTREAM"):
             os.environ["CHATVIZ_UPSTREAM"] = upstream_from_settings
             env["CHATVIZ_UPSTREAM"] = upstream_from_settings
             # redirect the same variable name to our proxy

@@ -21,6 +21,8 @@ export default function App() {
 
   const filtered = useFilteredMessages();
   const selected = messages.find((m) => m.id === selectedId) ?? null;
+  const workerSysKey = useMessageStore((s) => s.filters.workerSysKey);
+  const setWorkerSysKey = useMessageStore((s) => s.setWorkerSysKey);
 
   const hasToolUse = filtered.some((m) => m.message_type === 'tool_use');
 
@@ -42,7 +44,7 @@ export default function App() {
           <span style={{ fontWeight: 700, fontSize: 16, letterSpacing: '-0.02em', color: theme.textBright }}>
             chatviz
           </span>
-          <span style={{ color: theme.textGhost, fontSize: 12 }}>
+          <span style={{ color: theme.textSecondary, fontSize: 12 }}>
             {messages.length} message{messages.length !== 1 ? 's' : ''} captured
           </span>
           {(() => {
@@ -54,11 +56,21 @@ export default function App() {
             if (totalIn === 0 && totalOut === 0) return null;
             const fmt = (n: number) => n >= 1000 ? `${(n / 1000).toFixed(1)}k` : String(n);
             return (
-              <span style={{ color: theme.textGhost, fontSize: 12, fontFamily: 'monospace' }}>
+              <span style={{ color: theme.textSecondary, fontSize: 12, fontFamily: 'monospace' }}>
                 ↑{fmt(totalIn)} ↓{fmt(totalOut)} tokens
               </span>
             );
           })()}
+          {workerSysKey && (
+            <span style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 11 }}>
+              <span style={{ color: theme.textBright, background: theme.bgSunken, padding: '2px 8px', borderRadius: 12, border: `1px solid ${theme.borderMid}` }}>
+                Worker filtered
+              </span>
+              <button onClick={() => setWorkerSysKey(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: theme.textDim, padding: 0, fontSize: 12 }}>
+                ×
+              </button>
+            </span>
+          )}
           <div style={{ marginLeft: 'auto' }}>
             <button
               onClick={() => setIsDark(!isDark)}
@@ -78,7 +90,7 @@ export default function App() {
 
         <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
           <div style={{ flex: 1, overflow: 'auto' }}>
-            {hasToolUse
+            {hasToolUse || workerSysKey !== null
               ? <SequenceView messages={filtered} />
               : <ChatView messages={filtered} />}
           </div>

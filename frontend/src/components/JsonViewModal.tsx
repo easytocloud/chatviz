@@ -10,13 +10,6 @@ interface Props {
   onClose: () => void;
 }
 
-function findLastIndex<T>(arr: T[], pred: (item: T) => boolean): number {
-  for (let i = arr.length - 1; i >= 0; i--) {
-    if (pred(arr[i])) return i;
-  }
-  return -1;
-}
-
 function computeFocusPath(msg: CapturedMessage): JsonPath {
   const raw = msg.raw_body as any;
   const messages: any[] = raw?.messages ?? [];
@@ -24,14 +17,14 @@ function computeFocusPath(msg: CapturedMessage): JsonPath {
   switch (msg.message_type) {
     case 'user': {
       // Last user message whose content is a plain string (not tool results)
-      const idx = findLastIndex(messages, (m) =>
+      const idx = messages.findLastIndex((m) =>
         m.role === 'user' && (typeof m.content === 'string' || !Array.isArray(m.content))
       );
       return idx >= 0 ? ['messages', idx] : [];
     }
 
     case 'assistant': {
-      const idx = findLastIndex(messages, (m) => m.role === 'assistant');
+      const idx = messages.findLastIndex((m) => m.role === 'assistant');
       if (idx < 0) return [];
       const content = messages[idx]?.content;
       if (!Array.isArray(content)) return ['messages', idx];
@@ -47,7 +40,7 @@ function computeFocusPath(msg: CapturedMessage): JsonPath {
 
     case 'tool_use': {
       const toolId = (msg.content as any)?.id;
-      const idx = findLastIndex(messages, (m) => m.role === 'assistant');
+      const idx = messages.findLastIndex((m) => m.role === 'assistant');
       if (idx < 0) return [];
       const content = messages[idx]?.content;
       if (!Array.isArray(content)) return ['messages', idx];
@@ -59,8 +52,7 @@ function computeFocusPath(msg: CapturedMessage): JsonPath {
 
     case 'tool_result': {
       const toolUseId = msg.tool_use_id;
-      const idx = findLastIndex(
-        messages,
+      const idx = messages.findLastIndex(
         (m) => m.role === 'user' && Array.isArray(m.content) &&
           m.content.some((b: any) => b.type === 'tool_result')
       );

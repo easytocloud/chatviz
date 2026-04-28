@@ -3,6 +3,7 @@ import type { CapturedMessage } from '../types';
 import { MESSAGE_COLORS, FAMILY_COLORS } from '../styles/colors';
 import { useMessageStore } from '../store/messages';
 import { useTheme } from '../styles/theme';
+import { isInjected, contentPreview } from '../utils/messageHelpers';
 
 interface Props {
   messages: CapturedMessage[];
@@ -10,28 +11,6 @@ interface Props {
 
 // Only show the actual dialog turns — the system prompt lives in the detail panel
 const VISIBLE_TYPES = new Set(['user', 'assistant', 'tool_use', 'tool_result']);
-
-// Content that looks like injected context rather than human-typed text
-function isInjected(text: string): boolean {
-  const t = text.trimStart();
-  if (t.startsWith('<') && /<\w/.test(t)) return true;
-  if (/^\[?(INST|SYS|SYSTEM|CONTEXT|RECAP)\b/i.test(t)) return true;
-  return false;
-}
-
-function contentPreview(content: CapturedMessage['content']): string {
-  if (typeof content === 'string') return content.trimStart();
-  if (Array.isArray(content)) {
-    const texts = (content as any[])
-      .map((b: any) => (b?.text ?? b?.content ?? (typeof b === 'string' ? b : '')).trimStart())
-      .filter(Boolean);
-    // Prefer non-injected (non-XML) text when mixed content is present
-    const real = texts.filter((t) => !isInjected(t));
-    return (real.length > 0 ? real : texts).join(' ');
-  }
-  const obj = content as any;
-  return (obj?.text ?? obj?.content ?? obj?.name ?? JSON.stringify(content)).trimStart();
-}
 
 function isLeft(msg: CapturedMessage): boolean {
   return msg.message_type === 'user' || msg.message_type === 'tool_result';
