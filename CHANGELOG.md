@@ -1,3 +1,10 @@
+# [1.7.0](https://github.com/easytocloud/chatviz/compare/v1.6.0...v1.7.0) (2026-04-28)
+
+
+### Features
+
+* auto-hide and filter ([7e04e60](https://github.com/easytocloud/chatviz/commit/7e04e608ad7abb31fbfb931ce8ff2386cbd3bca3))
+
 # [1.6.0](https://github.com/easytocloud/chatviz/compare/v1.5.0...v1.6.0) (2026-04-27)
 
 
